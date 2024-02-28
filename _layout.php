@@ -1,3 +1,22 @@
+<?php
+    session_start();
+    if(isset($_SESSION['user'])) {
+        $user = $_SESSION['user'];
+        $interval = time() - $_SESSION['auth-moment'];
+        if($interval > 10) {
+            unset($_SESSION['user']);
+            unset($_SESSION['auth-moment']);
+
+        }
+        else {
+            $user = $_SESSION['user'];
+            $_SESSION['auth-moment'] = time();
+        }
+    }
+    else {
+        $user = "null";
+    }
+?>
 <!doctype html>
 <html>
 
@@ -22,29 +41,45 @@
 			'/layout' => 'Шаблонізація', 
             '/regexp' => 'Регулярні вирази' ,
 			'/api' => 'API',
-			'/registration' => 'Реєстрація'
+			'/signup' => 'Реєстрація'
 		] as $href => $name ) : ?>
 			<li <?= $uri==$href ? 'class="active"' : '' ?> ><a href="<?= $href ?>"><?= $name ?></a></li>
 		<?php endforeach ?>
-		<li><a class="modal-trigger" href="#modal-login">Вхід</a></li>
+      
+                 <?php
+                 if(isset($_SESSION['user'])) {
+                 ?> 
+                          <img style="max-height: 50px; max-width: 50px; border-radius: 50%;" src="/avatar/<?=$_SESSION['user']['avatar']?>"/>
+                          <li >  <a  id="out-botton" type="submit">Вихід</a> </li>
+                          
+                 <?php
+                         } else {
+                  ?>
+                        <li > <a class="modal-trigger" href="#modal-login">Вхід</a> </li>
+                    <?php
+                 }
+                ?>
+           
 	  </ul>
 	</div>
 </nav>
 
-<div class="container">
-<div id="modal-login" class="modal">
-    <div class="modal-content">
-        <h4>Вхід</h4>
+<?= var_export($user, true) ?></br> 
+
+<div class="container  p4 ">
+<div id="modal-login" class="modal p4">
+    <div class="auth-modal p4">
+        <h4 >Вхід</h4>
         <form id="login-form">
             <div class="input-field">
-                <input id="emailCheck" name="emailCheck" type="email" class="validate" required>
+                <input id="emailCheck" name="emailCheck1" type="email" class="validate" required>
                 <label for="emailCheck">Email</label>
             </div>
             <div class="input-field">
-                <input id="passwordCheck" name="passwordCheck" type="password" class="validate" required>
+                <input id="passwordCheck" name="passwordCheck1" type="password" class="validate" required>
                 <label for="passwordCheck">Пароль</label>
             </div>
-            <button class="btn deep-purple" type="submit" name="action">Увійти</button>
+            <button id = "auth-button" class="btn deep-purple" type="submit" name="action">Увійти</button>
         </form>
     </div>
     <div class="modal-footer">
